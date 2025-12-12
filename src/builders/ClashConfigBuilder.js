@@ -191,9 +191,10 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                     ...(proxy.tls?.server_name ? { sni: proxy.tls.server_name } : {}),
                     ...(proxy.tls?.insecure !== undefined ? { 'skip-cert-verify': !!proxy.tls.insecure } : {}),
                     ...(proxy.tls?.alpn ? { alpn: proxy.tls.alpn } : {}),
-                    ...(proxy['idle-session-check-interval'] !== undefined ? { 'idle-session-check-interval': proxy['idle-session-check-interval'] } : {}),
-                    ...(proxy['idle-session-timeout'] !== undefined ? { 'idle-session-timeout': proxy['idle-session-timeout'] } : {}),
-                    ...(proxy['min-idle-session'] !== undefined ? { 'min-idle-session': proxy['min-idle-session'] } : {}),
+                    // 适配新的 anytls 解析器输出的 snake_case 字段，并转换为 Clash 的 kebab-case 格式
+                    ...(proxy.idle_session_check_interval !== undefined ? { 'idle-session-check-interval': proxy.idle_session_check_interval } : {}),
+                    ...(proxy.idle_session_timeout !== undefined ? { 'idle-session-timeout': proxy.idle_session_timeout } : {}),
+                    ...(proxy.min_idle_session !== undefined ? { 'min-idle-session': proxy.min_idle_session } : {}),
                 };
             default:
                 return proxy; // Return as-is if no specific conversion is defined
@@ -409,4 +410,4 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
 
         return yaml.dump(this.config);
     }
-}
+                    }
