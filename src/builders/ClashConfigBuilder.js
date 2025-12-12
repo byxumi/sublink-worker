@@ -7,7 +7,8 @@ import { buildSelectorMembers, buildNodeSelectMembers, uniqueNames } from './hel
 import { emitClashRules, sanitizeClashProxyGroups } from './helpers/clashConfigUtils.js';
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl) {
+    // 构造函数新增 configName 参数
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, configName) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -19,6 +20,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.enableClashUI = enableClashUI;
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
+        this.configName = configName; // [新增] 存储自定义配置名称
     }
 
     getProxies() {
@@ -191,7 +193,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                     ...(proxy.tls?.server_name ? { sni: proxy.tls.server_name } : {}),
                     ...(proxy.tls?.insecure !== undefined ? { 'skip-cert-verify': !!proxy.tls.insecure } : {}),
                     ...(proxy.tls?.alpn ? { alpn: proxy.tls.alpn } : {}),
-                    // 适配新的 anytls 解析器输出的 snake_case 字段，并转换为 Clash 的 kebab-case 格式
                     ...(proxy.idle_session_check_interval !== undefined ? { 'idle-session-check-interval': proxy.idle_session_check_interval } : {}),
                     ...(proxy.idle_session_timeout !== undefined ? { 'idle-session-timeout': proxy.idle_session_timeout } : {}),
                     ...(proxy.min_idle_session !== undefined ? { 'min-idle-session': proxy.min_idle_session } : {}),
@@ -387,6 +388,11 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             `MATCH,${this.t('outboundNames.Fall Back')}`
         ];
 
+        // [新增] 将自定义配置名称添加到顶级配置
+        if (this.configName) {
+            this.config.name = this.configName;
+        }
+
         // Enable Clash UI (external controller/dashboard) when requested or when custom UI params are provided
         if (this.enableClashUI || this.externalController || this.externalUiDownloadUrl) {
             const defaultController = '0.0.0.0:9090';
@@ -410,4 +416,5 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
 
         return yaml.dump(this.config);
     }
-                    }
+}
+
