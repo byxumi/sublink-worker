@@ -4,6 +4,7 @@ import { parseVless } from './protocols/vlessParser.js';
 import { parseHysteria2 } from './protocols/hysteria2Parser.js';
 import { parseTrojan } from './protocols/trojanParser.js';
 import { parseTuic } from './protocols/tuicParser.js';
+import { parseAnytls } from './protocols/anytlsParser.js'; // [新增]
 import { fetchSubscription } from './subscription/httpSubscriptionFetcher.js';
 
 const protocolParsers = {
@@ -16,7 +17,8 @@ const protocolParsers = {
     http: fetchSubscription,
     https: fetchSubscription,
     trojan: parseTrojan,
-    tuic: parseTuic
+    tuic: parseTuic,
+    anytls: parseAnytls // [新增]
 };
 
 export class ProxyParser {
